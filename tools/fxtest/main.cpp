@@ -657,6 +657,27 @@ layout::Geometry placed( Session& s, int fit )
 	return g;
 }
 
+/// Every EOL in a stream, found here a bit at a time rather than by the
+/// decoder's word-wise search, so --timing's predictions share nothing with
+/// the receiver: the index of each 1 that ends eleven or more zeros.
+std::vector< size_t > eolsOf( const codec::Bits& bits )
+{
+	std::vector< size_t > eols;
+	size_t zeros = 0;
+	for( size_t i = 0; i < bits.size(); ++i )
+	{
+		if( bits[ i ] == 0 )
+		{
+			++zeros;
+			continue;
+		}
+		if( zeros >= 11 )
+			eols.push_back( i );
+		zeros = 0;
+	}
+	return eols;
+}
+
 /// Flipping this bit makes eleven zeros (a forged EOL) or breaks one.
 bool forgesOrBreaksEol( const codec::Bits& bits, size_t at )
 {
@@ -1679,7 +1700,7 @@ int runTiming( int width, int height, int perturb = 0, bool quiet = false )
 			unseeable += std::memcmp( sent.Row( i ), black.Row( i ), codec::kLineBytes ) == 0;
 
 		//Predictions from the stream alone.
-		const std::vector< size_t > eols = codec::FindEols( stream );
+		const std::vector< size_t > eols = eolsOf( stream );
 		std::vector< double > predicted( static_cast< size_t >( L ), -1.0 );
 		std::vector< long > bits( static_cast< size_t >( L ), 0 );
 		for( int i = 0; i < L && static_cast< size_t >( i + 1 ) < eols.size(); ++i )
@@ -1976,6 +1997,8 @@ int runBench( int frames )
 // (T.6: every line two-dimensional against the one above, no EOLs, EOFB),
 // each packed MSB first, with the page as a PBM. tools/gocheck decodes both
 // with golang.org/x/image/ccitt, which shares no code with this repo.
+// `--perturb 32` (VR1 written as VR2) exports a wrong G4 stream, which
+// gocheck must reject: verify.sh runs both.
 //---------------------------------------------------------------------------
 std::vector< unsigned char > packMsbFirst( const codec::Bits& bits )
 {
@@ -1986,7 +2009,7 @@ std::vector< unsigned char > packMsbFirst( const codec::Bits& bits )
 	return out;
 }
 
-int runExport( const std::string& dir, int width, int height )
+int runExport( const std::string& dir, int width, int height, int perturb )
 {
 	CGLContextObj ctx = CGLGetCurrentContext();
 	(void)ctx;
@@ -2002,12 +2025,13 @@ int runExport( const std::string& dir, int width, int height )
 
 		codec::Transmission g3;
 		codec::EncodeOptions eo;
-		eo.coding = codec::kMH;
+		eo.coding  = codec::kMH;
+		eo.perturb = perturb;
 		codec::Encode( page, eo, g3 );
 
 		codec::Bits g4;
 		for( int y = 0; y < page.lines; ++y )
-			codec::EncodeLine2D( page.Row( y ), y > 0 ? page.Row( y - 1 ) : nullptr, g4 );
+			codec::EncodeLine2D( page.Row( y ), y > 0 ? page.Row( y - 1 ) : nullptr, g4, perturb );
 		codec::PutBits( g4, t4::kEol );
 		codec::PutBits( g4, t4::kEol );
 
@@ -2312,7 +2336,7 @@ int main( int argc, char** argv )
 	};
 
 	if( !exportDir.empty() )
-		return finish( runExport( exportDir, width, height ) );
+		return finish( runExport( exportDir, width, height, perturb ) );
 
 	if( !checks.empty() )
 	{

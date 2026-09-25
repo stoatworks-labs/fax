@@ -69,22 +69,24 @@ Fax::Fax()
 	SetTimeSupported( true );
 
 	//---------------------------------------------------------------------
-	// Defaults. The frame as the page, standard resolution, a mid threshold,
-	// no halftone; MR at 14400 bit/s with a line that drops a few bits a
-	// page, one page at a time; the receiver repeating bad lines, on thermal
-	// paper, with the sender's header. See AGENTS.md for how these were
-	// chosen against Resolume's demo clips.
+	// Defaults. The frame as the page, standard resolution, a mid threshold
+	// through the halftone (Resolume's demo clips are dark, and a plain
+	// threshold prints most of them solid black); MR at 14400 bit/s on a line
+	// that drops a few dozen bits a page, a new page every frame (Live: the
+	// clip keeps moving); the receiver repeating bad lines, on thermal paper,
+	// with the sender's header. See AGENTS.md for how these were chosen
+	// against Resolume's demo clips.
 	//---------------------------------------------------------------------
 	params[ PT_FIT ]        = static_cast< float >( layout::kFitFrame );
 	params[ PT_RESOLUTION ] = static_cast< float >( layout::kStandard );
 	params[ PT_THRESHOLD ]  = 0.5f;
-	params[ PT_HALFTONE ]   = 0.0f;
+	params[ PT_HALFTONE ]   = 1.0f;
 
 	params[ PT_CODING ]     = static_cast< float >( codec::kMR );
-	params[ PT_LINE_NOISE ] = 0.35f;
+	params[ PT_LINE_NOISE ] = 0.4f;
 	params[ PT_BURSTS ]     = 0.0f;
 	params[ PT_BAUD ]       = 3.0f;//14400
-	params[ PT_MODE ]       = static_cast< float >( controls::kModePage );
+	params[ PT_MODE ]       = static_cast< float >( controls::kModeLive );
 
 	params[ PT_CONCEALMENT ] = static_cast< float >( codec::kConcealRepeat );
 	params[ PT_PAPER ]       = static_cast< float >( controls::kPaperThermal );
@@ -104,7 +106,7 @@ Fax::Fax()
 	declareOptions( PT_FIT, "Fit", layout::kFitCount, layout::FitName );
 	declareOptions( PT_RESOLUTION, "Resolution", layout::kResolutionCount, layout::ResolutionName );
 	SetParamInfof( PT_THRESHOLD, "Threshold", FF_TYPE_STANDARD );
-	SetParamInfo( PT_HALFTONE, "Halftone", FF_TYPE_BOOLEAN, false );
+	SetParamInfo( PT_HALFTONE, "Halftone", FF_TYPE_BOOLEAN, true );
 
 	declareOptions( PT_CODING, "Coding", controls::kCodingCount, controls::CodingName );
 	SetParamInfof( PT_LINE_NOISE, "Line Noise", FF_TYPE_STANDARD );
