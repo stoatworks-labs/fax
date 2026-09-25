@@ -300,8 +300,10 @@ Windows  %LOCALAPPDATA%\fax\logs\fax.YYYY-MM-DD.log
 - **No presets, no OpenFX version.**
 - **There is a browser demo** at [fax-demo.stoatworks-labs.com](https://fax-demo.stoatworks-labs.com).
   It is a port to a web page, not the plugin: the shaders run in WebGL2, and the coder, the line
-  and the decoder are rewritten in JavaScript, which only a reader has checked against the
-  plugin's. The page lists what it does not reproduce.
+  and the decoder are rewritten in JavaScript. Nothing checks that port on the page itself; in
+  the repository, `demo/tools/check_port.sh` compares it bit for bit with the plugin's own C++
+  on twelve test pages. The page is slower than the plugin and lists what it does not
+  reproduce.
 
 ---
 

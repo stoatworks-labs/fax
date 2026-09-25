@@ -165,8 +165,9 @@ lines, and K doubles as the lines halve, so on screen it is two or three lines o
 1080-line frame at any resolution: the harness measures it, a viewer sees a thick streak.
 A superfine halftone page every frame is not real-time. The
 [browser demo](https://fax-demo.stoatworks-labs.com/) runs the plugin's own shaders, but
-its CPU half — the coder, the line and the decoder — is a hand port to JavaScript, and
-nothing checks a port but a reader.
+its CPU half — the coder, the line and the decoder — is a hand port to JavaScript: nothing
+checks it on the page, and `demo/tools/check_port.sh` compares it bit for bit with the
+plugin's own C++ on twelve test pages (see Browser demo).
 
 ## Browser demo
 
