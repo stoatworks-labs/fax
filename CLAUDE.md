@@ -82,6 +82,20 @@ timing.
 - macOS build must be universal. Verify with `lipo`, never the build log.
 - FFGL id is `FX01`, display name `SW Fax`.
 
+## Browser demo
+- `demo/` is served at https://fax-demo.stoatworks-labs.com/ by this repo's Worker, through
+  a proxied AAAA `100::` DNS record + a route (the zone is out of custom domains; deleting
+  the record takes the page dark with green deploys). A push to main deploys it
+  (`deploy.yml`); by hand: `cf-run npx wrangler deploy`. Verify by content:
+  `curl -s 'https://fax-demo.stoatworks-labs.com/?cb=1' | grep -o '<title>[^<]*'`
+- The shaders in `demo/plugin.js` are spliced from `source/Shaders.cpp` by
+  `python3 demo/tools/splice_shaders.py` and checked by `demo/tools/check_shaders.py`.
+- `demo/fax.js` is a hand PORT of the CPU half; `demo/tools/check_port.sh build/fxtest`
+  compares it with the C++ source on 12 pages. The frame sequence in `plugin.js` only a
+  reader checks. Change a codec, line, header, layout or controls file: change fax.js too.
+- `demo/vendor/` is the shared kit: never edit it; re-run
+  `stoatworks-backend/resolume-demo/sync.sh fax`.
+
 ## Not done yet
 - **Never loaded into Resolume on macOS.** Measured offline, plus an `oxbow` load. On
   Windows, Arena 7.27.1 on llvmpipe: gate 9/9, six controls inconclusive (Live mode's

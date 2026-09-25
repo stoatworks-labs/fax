@@ -99,6 +99,7 @@ coder, a real noisy line and a real decoder, and the look falls out of the code:
 | `tools/check_tables.py` | T4.h against two independent transcriptions; writes the length fixture. |
 | `tools/gocheck/` | The independent decoder (Go, development only). |
 | `tools/sweep.py`, `tools/verify.sh` | No control is silently dead; all of it. |
+| `demo/` | The browser demo: `plugin.js` holds the plugin's three shader bodies verbatim (spliced by `tools/splice_shaders.py`, guarded by `tools/check_shaders.py`) and a port of the frame sequence; `fax.js` is a hand PORT of the CPU half; `vendor/` is the shared kit from `stoatworks-backend/resolume-demo` (never edit it, re-run `sync.sh`). Served at `fax-demo.stoatworks-labs.com` through a DNS record + route. See "The browser demo" below. |
 
 ---
 
@@ -398,6 +399,35 @@ between pages and one CPU spike of the Live figure per page.
   frame.
 
 ---
+
+## The browser demo
+
+`demo/` (2026-09-25) runs the scan and print passes as the plugin's own GLSL, copied
+unedited, and the CPU half as a **JavaScript port that only a reader checks on the page**:
+`demo/fax.js` translates T4.h, Codec.cpp, Line.cpp, Header.cpp, Font.cpp, Layout.cpp and
+Controls.cpp; `demo/plugin.js` translates the frame sequence of `Fax::ProcessOpenGL` and
+`Fax::startPage`. What checks what:
+
+- `demo/tools/check_shaders.py` (in `verify.sh`): the three shader bodies and the version
+  line are the plugin's, character for character.
+- `demo/tools/check_port.sh` (in `verify.sh`, skipped without node): builds
+  `demo/tools/refchain.cpp` against the plugin's source files unchanged, calls them in
+  `startPage`'s order, and compares `fax.js` with them on 12 pages (the exported card,
+  thresholded and halftone, and a synthetic page; MH and MR; all three resolutions; all
+  four bauds; noise, bursts, both concealments; header on and off) — the headed page, the
+  coded stream bit for bit, the line records, the corrupted stream and flip count, every
+  arrival time as a double, the decoded page and its bad / shown flags — plus T4.h's
+  strings, the fixture's 204 lengths, Font.cpp's 96 glyphs, 63 layouts, the header text and
+  the conversions. First run: identical, except that `Math.pow` and `std::pow` differ by
+  one ulp at 2 of the 101 Line Noise values tried; the check allows that ulp and requires
+  the integer cutoff the line uses to be identical (it is). Two mutations of `fax.js`
+  (concealing from two lines up; VR1 coded as VR2) both fail it.
+- Not checked by anything: `refchain.cpp`'s copy of `startPage`'s order, and the frame
+  sequence, clock and arrival bookkeeping in `plugin.js`.
+
+The page is slower than the plugin (the CPU half runs in JS on the main thread; the
+status line shows its cost) and lowers nothing to keep up. Its input is the kit's generated
+clips or the visitor's own image or video. Every gap is listed on the page.
 
 ## Open questions
 

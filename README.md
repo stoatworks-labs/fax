@@ -168,6 +168,16 @@ A superfine halftone page every frame is not real-time. The
 its CPU half — the coder, the line and the decoder — is a hand port to JavaScript, and
 nothing checks a port but a reader.
 
+## Browser demo
+
+[fax-demo.stoatworks-labs.com](https://fax-demo.stoatworks-labs.com/) runs the plugin's
+own scan and print shaders in WebGL2, with all 13 controls, on generated clips or your own
+image. The CPU half (header, T.4 coder, noisy line, decoder, page timing) is a JavaScript
+**port** in `demo/fax.js`: nobody checks it on the page but a reader, and
+`demo/tools/check_port.sh` (in `verify.sh`) compares it bit for bit with the plugin's C++
+source on twelve test pages. It is slower than the plugin; the page says so, and lists
+every other difference.
+
 ## Build
 
 Needs CMake 3.15+, a C++17 compiler, and the FFGL SDK submodule.
@@ -212,6 +222,12 @@ ffmpeg -i in.mov -f rawvideo -pix_fmt rgba - \
 ```
 
 No OpenFX port in 0.1.0. There is a [browser demo](https://fax-demo.stoatworks-labs.com/).
+The browser demo's own checks:
+
+```bash
+python3 demo/tools/check_shaders.py        # its shaders are the plugin's, character for character
+demo/tools/check_port.sh build/fxtest      # its JS port agrees with the C++ source on 12 pages
+```
 
 See [`CLAUDE.md`](CLAUDE.md) for the full command reference and [`AGENTS.md`](AGENTS.md)
 for the model and the traps.

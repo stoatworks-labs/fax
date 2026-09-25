@@ -38,6 +38,11 @@
 #                 with this repo -- decodes the plugin's G3 and G4 streams to
 #                 the page exactly, and rejects a stream coded with a wrong
 #                 vertical mode. Skipped without Go or the module in the cache.
+#   demo          the browser demo's copy of every shader is still the
+#                 plugin's, character for character (demo/tools/check_shaders.py),
+#                 and its JavaScript port of the CPU half agrees with the
+#                 plugin's C++ source on a set of test pages
+#                 (demo/tools/check_port.sh; skipped without node).
 #   pipe          the fleet's --pipe contract: whole frames only, a cue naming
 #                 no parameter refused, a failed render is exit 1, a closed
 #                 stdout is exit 1 (SIGPIPE ignored, never 141), and options
@@ -186,6 +191,28 @@ else
 		fi
 	fi
 	rm -rf "$dir"
+fi
+
+#---------------------------------------------------------------------------
+# The browser demo: its shaders are the plugin's, character for character, and
+# its port of the CPU half agrees with the C++ source on check_port's pages.
+#---------------------------------------------------------------------------
+step "demo"
+if out=$(python3 demo/tools/check_shaders.py 2>&1); then
+	pass "check_shaders.py: $( printf '%s\n' "$out" | tail -1 )"
+else
+	fail "the demo's shaders have drifted from source/Shaders.cpp"
+	printf '%s\n' "$out" | sed 's/^/      /'
+fi
+out=$(demo/tools/check_port.sh "$FXTEST" 2>&1)
+status=$?
+if [ "$status" -eq 0 ]; then
+	pass "check_port.sh: $( printf '%s\n' "$out" | tail -1 )"
+elif [ "$status" -eq 3 ]; then
+	printf '   %s\n' "$( printf '%s\n' "$out" | tail -1 )"
+else
+	fail "demo/fax.js no longer agrees with the plugin's source -- run: demo/tools/check_port.sh $FXTEST"
+	printf '%s\n' "$out" | grep -v '^ok ' | sed 's/^/      /'
 fi
 
 #---------------------------------------------------------------------------
