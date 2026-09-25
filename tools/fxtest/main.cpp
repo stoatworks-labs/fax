@@ -1973,7 +1973,7 @@ int runBench( int frames )
 	};
 	std::printf( "%d frames each, best of three runs, after a 10-frame warm-up, glFinish both sides.\n", frames );
 	std::printf( "Per page: the scan read-back, the sender (header + T.4), the line, the receiver, in ms.\n\n" );
-	std::printf( "mode                      resolution   ms/frame  %% of 60fps   pages   readback   code   line   decode\n" );
+	std::printf( "mode                       resolution   ms/frame  %% of 60fps   pages   readback   code   line   decode\n" );
 
 	struct Mode
 	{
@@ -1981,9 +1981,10 @@ int runBench( int frames )
 		Settings settings;
 	};
 	const Mode modes[] = {
-		{ "Page (defaults)         ", {} },
-		{ "Live, standard          ", { { "Mode", 1.0f } } },
-		{ "Live, superfine halftone", { { "Mode", 1.0f }, { "Resolution", 2.0f }, { "Halftone", 1.0f } } },
+		{ "defaults (Live, halftone)", {} },
+		{ "Live, threshold          ", { { "Halftone", 0.0f } } },
+		{ "Page, threshold          ", { { "Mode", 0.0f }, { "Halftone", 0.0f } } },
+		{ "Live, superfine halftone ", { { "Resolution", 2.0f } } },
 	};
 	for( const Mode& m : modes )
 		for( const Size& size : sizes )
@@ -1992,9 +1993,10 @@ int runBench( int frames )
 			std::printf( "%s  %s  %8.3f    %5.1f%%   %5d   %8.3f %6.3f %6.3f %8.3f\n", m.name, size.name, r.ms, r.ms / 16.667 * 100.0,
 			             r.pages, r.cpu.readback, r.cpu.code, r.cpu.channel, r.cpu.decode );
 		}
-	std::printf( "\nPage mode starts a page only when the last has arrived, so its CPU half runs\n"
-	             "once every few seconds and the frame figure is almost all print pass; Live\n"
-	             "runs the whole CPU half every frame.\n" );
+	std::printf( "\nLive runs the whole CPU half every frame. Page starts a page only when the\n"
+	             "last has arrived (about six seconds for the thresholded card at 14400), so\n"
+	             "its frame figure is the print pass, and its CPU half is a spike of the size\n"
+	             "shown once a page.\n" );
 	return 0;
 }
 

@@ -265,7 +265,7 @@ for size in 320x180 480x270; do
 done
 
 step "bench (for the record)"
-"$FXTEST" --bench --frames 60 2>&1 | sed -n '4,13p' | sed 's/^/   /'
+"$FXTEST" --bench --frames 60 2>&1 | sed -n '4,16p' | sed 's/^/   /'
 
 BUNDLE="$BUILD/Fax.bundle"
 BIN="$BUNDLE/Contents/MacOS/Fax"
