@@ -6,10 +6,28 @@
 #include <array>
 #include <cstring>
 
+#if defined( _MSC_VER )
+#include <intrin.h>
+#endif
+
 namespace fax::codec
 {
 namespace
 {
+/// Zeros above the highest set bit of a word that is not zero. GCC and Clang
+/// have a builtin; MSVC has none by that name (the first Windows CI build
+/// failed on it), so it takes the index of the highest set bit instead.
+inline int LeadingZeros( uint64_t word )
+{
+#if defined( _MSC_VER )
+	unsigned long index = 0;
+	_BitScanReverse64( &index, word );
+	return 63 - static_cast< int >( index );
+#else
+	return __builtin_clzll( word );
+#endif
+}
+
 //---------------------------------------------------------------------------
 // Decoding tries, built once from T4.h. Node 0 is the root; a child index of
 // 0 means "no such code".
@@ -220,7 +238,7 @@ struct Packed
 					zeros += static_cast< size_t >( valid - at );
 					break;
 				}
-				const int lead = __builtin_clzll( word );//zeros before the next 1
+				const int lead = LeadingZeros( word );//zeros before the next 1
 				if( at + lead >= valid )
 				{
 					zeros += static_cast< size_t >( valid - at );
