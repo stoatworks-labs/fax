@@ -46,9 +46,9 @@ const char* ResolutionName( int index );
 /// Lines per millimetre (2.2/T.4).
 double LinesPerMillimetre( int resolution );
 
-/// The MR parameter K: one line in K is one-dimensional. 4.2.1/T.4 gives 2 at
-/// 3.85 lines/mm and 4 at 7.7. The superfine 8 is the figure recalled for the
-/// higher resolutions and was NOT checked against the Recommendation's text
+/// The MR parameter K: one line in K is one-dimensional. 4.2.1.1/T.4 (07/2003)
+/// gives 2 at standard, 4 at 200 and 8 at 400 lines/25.4 mm, and the note to
+/// its Table 2 treats 7.7 and 15.4 lines/mm as equivalent to 200 and 400
 /// (see AGENTS.md); `--wedge` measures whatever K this returns.
 int K( int resolution );
 

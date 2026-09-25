@@ -84,7 +84,6 @@ timing.
 ## Not done yet
 - **Never loaded into Resolume.** Measured offline, plus an `oxbow` load.
 - No GitHub repo, release, website entry, user guide, browser demo, OpenFX port or presets.
-- `StoatworksAbout.h` and `ATTRIBUTIONS.md` are provisional hand copies (`guide` empty).
 
 ## Diagnostics
 

@@ -146,9 +146,7 @@ It has **never been loaded into Resolume.** Everything above was compiled, rende
 measured offline against the real plugin class in a headless CGL context, plus an `oxbow`
 load. Windows has never been built. The look has been seen on the synthetic test card and,
 through the harness's `--pipe`, on six of Resolume's bundled demo clips, which is where the
-defaults came from. The superfine K of 8 is recalled from the Recommendation, not read
-from its text. A superfine halftone page every frame is not real-time. The About block and
-`ATTRIBUTIONS.md` are provisional.
+defaults came from. A superfine halftone page every frame is not real-time.
 
 ## Build
 
