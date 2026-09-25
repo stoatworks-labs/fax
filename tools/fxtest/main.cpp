@@ -516,6 +516,10 @@ struct Session
 		makeTargets();
 	}
 
+	/// Draw into only one pixel of the output (the host's viewport), for
+	/// checks that read the receiver's page and not the picture.
+	bool pixelOnly = false;
+
 	/// Render at `seconds` on the synthetic clock, whose unit is declared.
 	bool renderAtTime( double seconds )
 	{
@@ -523,7 +527,7 @@ struct Session
 		plugin.SetTime( seconds );
 
 		glBindFramebuffer( GL_FRAMEBUFFER, outputFBO );
-		glViewport( 0, 0, width, height );
+		glViewport( 0, 0, pixelOnly ? 1 : width, pixelOnly ? 1 : height );
 		glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
 		glClear( GL_COLOR_BUFFER_BIT );
 		const bool ok = plugin.ProcessOpenGL( &process ) == FF_SUCCESS;
@@ -1709,7 +1713,10 @@ int runTiming( int width, int height, int perturb = 0, bool quiet = false )
 			predicted[ static_cast< size_t >( i ) ] = static_cast< double >( eols[ static_cast< size_t >( i + 1 ) ] + 1 + ( mr ? 1 : 0 ) ) / baud;
 		}
 
-		//Step the clock and watch the page arrive.
+		//Step the clock and watch the page arrive. The steps read the page,
+		//not the picture, so they draw one pixel: 11,000 full renders take
+		//minutes on the software renderer and prove nothing more.
+		s.pixelOnly = true;
 		constexpr double kStep = 0.002;
 		std::vector< double > arrivedBy( static_cast< size_t >( L ), -1.0 ), arrivedAfter( static_cast< size_t >( L ), -1.0 );
 		int seen          = 0;
