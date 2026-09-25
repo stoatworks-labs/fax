@@ -334,7 +334,25 @@ Every number is `tools/verify.sh` on this machine against a fresh universal Rele
 - **Render cost** (`fxtest --bench`, best of three runs of 60 frames, `glFinish` both
   sides, on a shared machine):
 
-BENCH_TABLE
+| mode | raster | ms/frame | % of a 60 fps frame | CPU a page: read-back / sender / line / receiver (ms) |
+| --- | --- | --- | --- | --- |
+| defaults (Live, halftone: ~2.2 million bits a page, every frame) | 1280x720 | 10.42 | 62.5% | 1.43 / 3.00 / 1.50 / 4.36 |
+| | 1920x1080 | 9.15 | 54.9% | 1.52 / 2.42 / 1.35 / 3.81 |
+| | 3840x2160 | 10.66 | 64.0% | 3.15 / 2.35 / 1.35 / 3.76 |
+| Live, threshold (~90,000 bits a page) | 1280x720 | 0.73 | 4.4% | 0.30 / 0.16 / 0.06 / 0.18 |
+| | 1920x1080 | 0.83 | 5.0% | 0.39 / 0.16 / 0.06 / 0.19 |
+| | 3840x2160 | 1.76 | 10.6% | 1.32 / 0.17 / 0.06 / 0.18 |
+| Page, threshold (between pages: the print pass alone) | 1280x720 | 0.03 | 0.2% | once a page, as Live threshold |
+| | 1920x1080 | 0.04 | 0.2% | |
+| | 3840x2160 | 0.06 | 0.4% | |
+| Live, superfine halftone (~9 million bits a page) | 1280x720 | 32.17 | 193% | 1.03 / 11.57 / 5.56 / 13.88 |
+| | 1920x1080 | 31.91 | 191% | 1.20 / 11.47 / 5.51 / 13.61 |
+| | 3840x2160 | 32.66 | 196% | 1.86 / 11.30 / 5.54 / 13.83 |
+
+At the defaults the CPU half is almost all of the frame: about 9 ms at 1080p, the
+sender and the receiver each ~2.5–4 ms, the line (a hash per bit) ~1.4 ms. Superfine
+halftone in Live mode is **not real-time** (about 31 fps). Page mode costs the print pass
+between pages and one CPU spike of the Live figure per page.
 
 ### Assumed, or not done
 
