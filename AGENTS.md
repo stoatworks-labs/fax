@@ -309,7 +309,7 @@ Every number is `tools/verify.sh` on this machine against a fresh universal Rele
   with no pel damaged before the error, 47 felt, 39 visibly damaged; 0 pixels moved outside
   the damaged rows.
 - **Wedge.** K = 2, 4, 8, off and Repeat Line: 23 errors each, all contained before the
-  next 1-D line, tallest exactly K (2, 4, 8); with concealment off, an error in a 1-D line
+  next 1-D line; with concealment off the tallest is exactly K (2, 4, 8) and an error in a 1-D line
   ran exactly K lines in 12 of 16 (K = 2) and 10 of 16 (K = 4 and 8), the rest shorter or
   invisible; 0 pixels outside.
 - **Conceal.** MH 113 (112 at 1280 x 720) and MR 161 concealed lines, every one equal to

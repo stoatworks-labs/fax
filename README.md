@@ -105,7 +105,7 @@ numbers:
 | `--scan` | **0** wrong pels of 0.8–3.9 million per case against the scan recomputed in double, six cases across the three fits and three resolutions, halftone, and a transparent third that scans as paper |
 | `--print` | **0** of 57,600 / 921,600 pixels off the page's pel coverage by more than one 8-bit step, four cases; alpha **255** everywhere over a partly transparent source |
 | `--streak` | 47 single-bit errors in MH lines: **47** damaged no line but their own, none before the error; all felt (39 visibly, the rest a streak in the line's own colour); **0** pixels moved outside the damaged rows |
-| `--wedge` | 23 errors at each of K = **2, 4, 8**, with concealment off and Repeat Line: all contained before the next one-dimensional line; the tallest wedge exactly K |
+| `--wedge` | 23 errors at each of K = **2, 4, 8**, with concealment off and Repeat Line: all contained before the next one-dimensional line; with concealment off the tallest wedge is exactly K |
 | `--conceal` | MH 113 and MR 161 concealed lines on a noisy halftone page, **every one** equal to the line above bit for bit |
 | `--timing` | blank and busy pages, MH at 14400 and MR at 9600: all **466** line arrivals within 2 ms of ( bits through the line's EOL ) / baud; every blank line exactly the 10 ms floor; the blank page 4.66 s against 5.6 s busy |
 | `--resize` | a resize to another aspect mid-page: the page identical to an unresized run on **every** frame |
