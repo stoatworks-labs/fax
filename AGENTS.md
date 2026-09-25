@@ -17,8 +17,9 @@ Built 2026-09-25 in one session from `specs/SPEC-fax.md` and the fleet's templat
 teletext for the whole read-back-then-CPU shape, the harness, `--pipe` and the negative
 controls; slowscan for a page that arrives a line at a time; tinsel for `PassBuffer`,
 the sweep and CI; graticule's font by way of teletext; repousse and wipe for the
-software-renderer pass. Tranche five, Allan's own pick. A local v0.1.0: no GitHub, no
-release, no website, never in Arena.
+software-renderer pass. Tranche five, Allan's own pick. Released as v0.1.0 on 2026-09-25:
+public repo, notarised macOS and Windows builds, user guide, site page, video, reel and a
+browser demo (see "The release" below).
 
 ---
 
@@ -239,6 +240,27 @@ rebuilt `--print` passes.
 
 ---
 
+## The release (2026-09-25)
+
+Traps the release found, in order:
+
+- **No `vcpkg.json`.** The first Windows CI run failed at configure (FindGLEW found
+  nothing): the manifest that makes vcpkg install GLEW was never written. Teletext's, renamed.
+- **`__builtin_clzll` is not MSVC.** The second failed on C3861 in `Codec.cpp`'s EOL scan.
+  `LeadingZeros()` uses `_BitScanReverse64` under `_MSC_VER`. The build session's checklist
+  (reserved GLSL words, `M_PI`, `far`/`near`, `<cmath>`) had no line for compiler builtins.
+- **Superfine K = 8 confirmed** from the text of T.4 (07/2003), 4.2.1.1 and the note to
+  Table 2 (see Decisions).
+- **MR's wedge cannot be filmed at full frame.** K doubles as the lines halve, so the
+  wedge is always ~2.3 lines of a 1080-line frame; the video shows streaks, concealment,
+  resolution (cropped 3x on the still astronaut), Page mode, A4 and paper, and says nothing
+  about the wedge it cannot show.
+- **The CPU cost stands at the defaults.** 9–10 ms a frame at 1080p for a halftone page
+  every frame; Halftone off is under 1 ms. The halftone default was kept because the clips
+  need it to show their tones, and the guide, README, site and video say the cost and the
+  way out plainly.
+- **The Arena gate cannot measure six controls** in Live mode (per-frame noise, above).
+
 ## Decisions taken without asking
 
 - **The coder and decoder run on the CPU**, from a read-back, as spec'd. MH and MR are
@@ -359,12 +381,18 @@ between pages and one CPU spike of the Live figure per page.
 
 ### Assumed, or not done
 
-- **Never loaded into Resolume.** Everything above is offline against the real plugin
-  class in a headless CGL context, plus an `oxbow` load. How the CPU half behaves inside a
-  busy host, and what the host's clock does over hours, is untested.
-- **Windows has never been built.** The CI workflow is written and cannot run yet.
-- **Footage has only been seen through `--pipe`**, on six of Resolume's bundled clips at
-  1280 x 720; the defaults were chosen there.
+- **Never loaded into Resolume on macOS.** Everything above is offline against the real
+  plugin class in a headless CGL context, plus an `oxbow` load. How the CPU half behaves
+  inside a busy host, and what the host's clock does over hours, is untested.
+- **Windows: Arena 7.27.1 on win-lab (Mesa llvmpipe, no GPU), 2026-09-25.** The DLL CI built
+  from d0a3923 loads, registers as `SW Fax` / `FX01` / effect, all 19 host controls match
+  the declaration, it renders and the log is clean: the fleet gate's 9 of 9, one run.
+  Controls: 8 live (Opacity, Fit, Threshold, Halftone, Line Noise, Mode, Paper, Mix), 6
+  inconclusive (Resolution, Coding, Bursts, Baud, Concealment, Header) because Live mode
+  codes a new page with new bit errors every frame, a noise floor of 17.8 levels that the
+  gate's still carrier cannot get under. The sweep carries those six.
+- **Footage has only been seen through `--pipe`**: every Shop74 clip at the defaults and
+  with Halftone off, and the project video's beats at 1080p.
 - The error model and the paper colours are stated, not measured.
 - **Superfine halftone in Live mode is not real-time** (see the bench): ~31 ms of CPU a
   frame.

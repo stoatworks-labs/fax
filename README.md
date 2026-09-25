@@ -24,6 +24,9 @@ The picture sent as a Group 3 fax over a noisy telephone line, as an FFGL effect
 <sub>One frame, rendered by `fxtest`, the offline harness — not captured from Resolume.
 The test card at the defaults.</sub>
 
+<!-- downloads:start -->
+<!-- downloads:end -->
+
 ## The one idea
 
 A Group 3 fax (ITU-T T.4) does not send pixels. It thresholds each scan line to black and
@@ -87,8 +90,9 @@ line by line, choose Page — and turn Halftone off, or wait two and a half minu
 
 ## Status
 
-**Unreleased — 25 September 2026.** A local v0.1.0: no download, no user guide, no
-browser demo, no OpenFX port.
+**v0.1.0 — 25 September 2026.** The first release: a universal macOS bundle and a
+Windows x64 DLL, with a [user guide](https://stoatworks-labs.com/software/fax/guide/)
+and a [browser demo](https://fax-demo.stoatworks-labs.com/). No OpenFX port, no presets.
 
 ### Measured offline, on macOS
 
@@ -142,11 +146,27 @@ between pages and one CPU spike of the Live figure per page.
 
 ### Not established
 
-It has **never been loaded into Resolume.** Everything above was compiled, rendered and
-measured offline against the real plugin class in a headless CGL context, plus an `oxbow`
-load. Windows has never been built. The look has been seen on the synthetic test card and,
-through the harness's `--pipe`, on six of Resolume's bundled demo clips, which is where the
-defaults came from. A superfine halftone page every frame is not real-time.
+It has **never been loaded into Resolume on macOS.** Everything above was compiled,
+rendered and measured offline against the real plugin class in a headless CGL context,
+plus an `oxbow` load. How the CPU half (on the render thread) behaves inside a busy
+composition, and what the host's clock does over hours, are untested.
+On Windows it has: a build of v0.1.0 loads, registers and renders in Resolume Arena 7.27.1
+on software rendering (win-lab, Mesa llvmpipe, no GPU, 2026-09-25), with all 19 host
+controls matching the declaration and Arena's log clean: 9 of the fleet Arena gate's 9
+checks, in one run. Eight controls were shown moving the picture there; Resolution,
+Coding, Bursts, Baud, Concealment and Header were inconclusive, because Live mode codes a
+new page with new bit errors every frame and the picture never stands still (noise floor
+17.8 levels); the sweep above shows all 13 changing it. Software rendering says nothing
+about a GPU or about speed.
+The look has been seen on the synthetic test card and, through the harness's `--pipe`,
+on every bundled Shop74 clip and in the project video: clips on transparency print as
+pictures on paper; full-frame dark clips print nearly solid. MR's wedge is at most K
+lines, and K doubles as the lines halve, so on screen it is two or three lines of a
+1080-line frame at any resolution: the harness measures it, a viewer sees a thick streak.
+A superfine halftone page every frame is not real-time. The
+[browser demo](https://fax-demo.stoatworks-labs.com/) runs the plugin's own shaders, but
+its CPU half — the coder, the line and the decoder — is a hand port to JavaScript, and
+nothing checks a port but a reader.
 
 ## Build
 
@@ -191,7 +211,7 @@ ffmpeg -i in.mov -f rawvideo -pix_fmt rgba - \
   | ffmpeg -f rawvideo -pix_fmt rgba -s 1920x1080 -i - out.mov
 ```
 
-OpenFX port and browser demo: not in 0.1.0.
+No OpenFX port in 0.1.0. There is a [browser demo](https://fax-demo.stoatworks-labs.com/).
 
 See [`CLAUDE.md`](CLAUDE.md) for the full command reference and [`AGENTS.md`](AGENTS.md)
 for the model and the traps.

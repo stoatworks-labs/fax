@@ -2,7 +2,8 @@
 
 The picture sent as a Group 3 fax (ITU-T T.4) over a noisy line, as an FFGL **effect**
 for Resolume Arena/Avenue. C++/GLSL, CMake MODULE → universal `.bundle` (macOS) +
-Windows `.dll`. MIT. Local v0.1.0, 2026-09-25; unreleased, never loaded into Resolume.
+Windows `.dll`. MIT. v0.1.0 released 2026-09-25 (github.com/stoatworks-labs/fax); never loaded into
+Resolume on macOS; Arena on win-lab 9/9 (software rendering).
 
 Read `AGENTS.md` before changing the tables, the coder, the decoder, the line or the page
 timing.
@@ -82,8 +83,11 @@ timing.
 - FFGL id is `FX01`, display name `SW Fax`.
 
 ## Not done yet
-- **Never loaded into Resolume.** Measured offline, plus an `oxbow` load.
-- No GitHub repo, release, website entry, user guide, browser demo, OpenFX port or presets.
+- **Never loaded into Resolume on macOS.** Measured offline, plus an `oxbow` load. On
+  Windows, Arena 7.27.1 on llvmpipe: gate 9/9, six controls inconclusive (Live mode's
+  per-frame noise), `plugin-bench/arena/expect/fax.json`.
+- No OpenFX port, no presets. The user guide is `docs/USER-GUIDE.md` (the site page and
+  both PDFs are generated from it by the website's `build_guides.py fax`).
 
 ## Diagnostics
 
