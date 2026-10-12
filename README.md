@@ -1,39 +1,34 @@
 # fax
 
 > **AI-assisted project.** This codebase was created with [Claude](https://claude.com/claude-code)
-> (Anthropic), directed and reviewed by a human author. The fax is not asserted but
-> measured: an offline harness drives the real plugin class in a headless GL context and
-> reads each claim back — the 204 code-table entries agree bit for bit with two
-> independent transcriptions of ITU-T T.4 and every run length round-trips at exactly the
-> standard's bits; an independent decoder (Go's `x/image/ccitt`) reads the plugin's own
-> streams back to its page exactly; with a clean line the received page is the sent page,
-> bit for bit, in MH and MR; one bit error in an MH line damages that line from the error
-> on and nothing else; one in MR runs down no further than the next one-dimensional line,
-> at most K = 2, 4 or 8 lines; with Repeat Line every concealed line is the line above;
-> and in Page mode every line arrives within 2 ms of its bit count over the baud — with
-> nine negative controls that prove each check can fail. It has **never been loaded into
-> Resolume**; the only host it has met is
-> [oxbow](https://github.com/stoatworks-labs/oxbow), which is a real FFGL host and is not
-> Resolume. See [Status](#status).
+> (Anthropic), directed and reviewed by a human author. The fax is measured rather than taken
+> on trust: an offline harness drives the real plugin class in a headless GL context and reads
+> each claim back, from the code tables agreeing bit for bit with two independent
+> transcriptions of ITU-T T.4 (one of them Go's `x/image/ccitt`) to every line in Page mode
+> arriving within 2 ms of when the baud rate says it should, with nine negative controls to
+> show each check can fail. It has **never been loaded into Resolume**; the only host it has
+> met is [oxbow](https://github.com/stoatworks-labs/oxbow), which is a proper FFGL host but
+> isn't Resolume. The full list is under [Status](#status).
 
-The picture sent as a Group 3 fax over a noisy telephone line, as an FFGL effect for
-[Resolume](https://resolume.com) Arena and Avenue.
+Your clip sent as a Group 3 fax down a noisy telephone line, as an FFGL effect for
+[Resolume](https://resolume.com) Arena and Avenue. It's a proper T.4 coder, a line that flips
+bits and a decoder at the other end, so the glitches are the ones a real fax makes.
 
 ![The test card as a received fax on warm-grey thermal paper: a header line with the time, "FROM: SW FAX" and a page number; the sky and the colour patches rendered as ordered-dither halftone; a resolution wedge of black bars; a dark disc; and here and there a line repeated from the one above, where the receiver concealed a bit error](docs/hero.png)
 
-<sub>One frame, rendered by `fxtest`, the offline harness — not captured from Resolume.
-The test card at the defaults.</sub>
+<sub>One frame, rendered by `fxtest`, the offline harness, rather than captured from Resolume.
+It's the test card at the defaults.</sub>
 
 [![Fax — the clip sent as a Group 3 fax over a noisy line, for Resolume](docs/video-thumb.png)](https://www.youtube.com/watch?v=w-YRqZRX3HI)
 
-*[Watch it](https://www.youtube.com/watch?v=w-YRqZRX3HI) — 58 seconds:
+*[Watch it](https://www.youtube.com/watch?v=w-YRqZRX3HI) (58 seconds):
 the dancers halftoned at the defaults, bit-error streaks on the tank with concealment off and
 then Repeat Line, Standard, Fine and Superfine on the astronaut (cropped three times up), Page
 mode sending a sphere line by line at 14400 bit/s, A4 Letterbox and plain paper, and the skulls
-with the header off and Mix down to the clip. Every frame is the real plugin's output: an FFGL
-plugin has no window, so the footage is rendered by this repository's own offline harness
-(`fxtest --pipe`, driven by a cue sheet) rather than filmed off a screen, and the clips are
-Resolume's bundled demo media.*
+with the header off and Mix down to the clip. It's all the plugin's own output. An FFGL plugin
+doesn't have a window to film, so the footage comes from this repo's offline harness
+(`fxtest --pipe`, driven by a cue sheet) rather than a screen, and the clips are Resolume's
+bundled demo media.*
 
 <!-- downloads:start -->
 
@@ -69,50 +64,50 @@ macOS builds are signed and notarised and open normally. The Windows builds are 
 
 ## The one idea
 
-A Group 3 fax (ITU-T T.4) does not send pixels. It thresholds each scan line to black and
-white — 1728 pels across 215 mm — and sends **run lengths** as variable-length codes,
-the Modified Huffman code, one line at a time, each line ended by an EOL. In MR, most
+A Group 3 fax (ITU-T T.4) doesn't send pixels. It thresholds each scan line to black and
+white (1728 pels across 215 mm) and sends **run lengths** as variable-length codes,
+the Modified Huffman code, one line at a time, each line finished with an EOL. In MR, most
 lines are sent as **differences from the line above**, with a plain one-dimensional line
-every K lines so that an error cannot run for ever.
+every K lines so an error can't run on forever.
 
-This plugin sends the clip through a real T.4 coder, a real noisy line and a real
-decoder, and the look of a fax falls out of the code rather than being drawn:
+This plugin pushes the clip through an actual T.4 coder, a noisy line and a decoder,
+and the fax look comes out of the code rather than being drawn on:
 
 - **A bit error desynchronises the rest of its line.** The decoder reads the wrong code
-  lengths until the line's EOL: a streak from the error to the right edge, and nothing
-  on the next line.
-- **In MR the error runs downwards**, because each following line is decoded against a
-  corrupted reference, until the next one-dimensional line: a wedge at most K lines tall
-  — 2 at standard resolution, 4 at fine, 8 at superfine.
-- **Concealment.** A decoder that finds a bad line (an invalid code, a line that is not
-  1728 pels, anything but fill before the EOL) repeats the line above — and in MR every
+  lengths until the line's EOL, so you get a streak from the error to the right edge, and
+  nothing on the next line.
+- **In MR the error runs downwards**, because every following line is decoded against a
+  spoilt reference, until the next one-dimensional line: a wedge at most K lines tall
+  (2 at standard resolution, 4 at fine, 8 at superfine).
+- **Concealment.** A decoder that finds a bad line (an invalid code, a line that isn't
+  1728 pels, anything but fill before the EOL) repeats the line above, and in MR every
   line after it until the next one-dimensional line. That vertical stretch is the
   familiar fax glitch.
-- **Resolution.** 3.85 lines per millimetre at standard against 8 pels, so a standard fax
-  is squashed and doubled vertically: a 16:9 frame is 466 lines.
+- **Resolution.** 3.85 lines per millimetre at standard against 8 pels across, so a standard
+  fax comes out squashed and gets doubled vertically: a 16:9 frame is 466 lines.
 - **Transmission time.** White runs are cheap. In Page mode the page arrives line by line
-  at the line rate — a blank page in 4.7 s at 14400 bit/s, a thresholded frame in about
-  six, a halftone photograph in two and a half minutes — faster over blank paper, and never
-  faster than the 10 ms minimum a scan line may take.
-- **The header** is printed by the *sending* machine into the top of the page before it
-  is coded, so it breaks on the line like everything else.
+  at the line rate: a blank page in 4.7 s at 14400 bit/s, a thresholded frame in about
+  six, a halftone photograph in two and a half minutes. It's quicker over blank paper, and
+  never faster than the 10 ms minimum a scan line may take. Every bit as slow as you remember.
+- **The header** is printed by the *sending* machine into the top of the page before it's
+  coded, so it gets mangled on the way like everything else.
 
 ### What is drawn, and what is not
 
-The code tables in `source/T4.h` were typed from the Recommendation by hand and are
-checked three ways: against two independent transcriptions, against the standard's code
-lengths, and by decoding the plugin's streams with a decoder that shares no code with it.
-The receiver finds every EOL first and decodes each line from the stretch between two,
-which is what confines an error to its line. The print pass draws the received page by
-the exact area black pels cover in each output pixel, on warm-grey thermal paper or white
-plain paper. Paper is opaque: the output's alpha is 1.
+The code tables in `source/T4.h` were typed in from the Recommendation by hand (about as
+much fun as it sounds) and are checked three ways: against two independent transcriptions,
+against the standard's code lengths, and by decoding the plugin's streams with a decoder that
+shares no code with it. The receiver finds every EOL first and decodes each line from the
+stretch between two, which is what keeps an error to its own line. The print pass draws the
+received page by the exact area black pels cover in each output pixel, on warm-grey thermal
+paper or white plain paper. Paper is opaque, so the output's alpha is 1.
 
 ### The honest limit
 
-Error Correction Mode — the retransmission real fax machines have used since the 1990s,
-which is why a modern fax never streaks — is not modelled; this is the Group 3 fax of the
-1980s. The error model (independent bit errors, optional bursts) is stated, not measured
-from a modem, and the minimum scan-line time is fixed at 10 ms.
+Error Correction Mode (the retransmission real fax machines have used since the 1990s, and
+the reason a modern fax never streaks) isn't modelled; this is the Group 3 fax of the
+1980s. The error model (independent bit errors, optional bursts) is stated rather than
+measured from a modem, and the minimum scan-line time is fixed at 10 ms.
 
 ## Controls
 
@@ -125,20 +120,21 @@ from a modem, and the minimum scan-line time is fixed at 10 ms.
 The defaults are the frame as the page, standard resolution, Halftone at threshold 0.5,
 MR at 14400 bit/s with Line Noise 0.4 (a bit error rate of 4e-5), Live, Repeat Line,
 thermal paper and the header. Resolume's bundled clips are dark, and a plain threshold
-prints most of them solid black; the halftone renders their tones. For the page arriving
-line by line, choose Page — and turn Halftone off, or wait two and a half minutes a page.
+prints most of them solid black; the halftone shows their tones. For the page arriving
+line by line, choose Page, and turn Halftone off unless you fancy waiting two and a half
+minutes a page.
 
 ## Status
 
-**v0.1.0 — 25 September 2026.** The first release: a universal macOS bundle and a
+**v0.1.0, 25 September 2026.** The first release: a universal macOS bundle and a
 Windows x64 DLL, with a [user guide](https://stoatworks-labs.com/software/fax/guide/)
 and a [browser demo](https://fax-demo.stoatworks-labs.com/). No OpenFX port, no presets.
 
 ### Measured offline, on macOS
 
-`tools/verify.sh` passes on this machine (M4 Max, macOS 26.4) against a fresh universal
-Release build, running every picture check at **two rasters**, 320×180 and 1280×720, and
-again at 320×180 on Apple's software renderer (what CI has). What it establishes, in
+`tools/verify.sh` passes on this Mac (M4 Max, macOS 26.4) against a fresh universal
+Release build. It runs every picture check at **two rasters**, 320×180 and 1280×720, and
+again at 320×180 on Apple's software renderer (what CI has). Here's what it shows, in
 numbers:
 
 | check | result |
@@ -161,8 +157,8 @@ numbers:
 | the bundle | universal (`x86_64 arm64`), exports `plugMain`, ad-hoc signs; `oxbow` reports `SW Fax` / `FX01` / `effect` and renders 120 frames through `plugMain` |
 
 Render cost (`fxtest --bench`, best of three runs of 60 frames, `glFinish` both sides, on
-a CPU and GPU shared with other builds), with the CPU half — read-back, the sending
-machine, the line and the receiver — separately per page:
+a CPU and GPU shared with other builds), with the CPU half (read-back, the sending
+machine, the line and the receiver) separately per page:
 
 | mode | raster | ms/frame | % of a 60 fps frame | CPU a page: read-back / sender / line / receiver (ms) |
 | --- | --- | --- | --- | --- |
@@ -179,33 +175,35 @@ machine, the line and the receiver — separately per page:
 | | 1920x1080 | 31.91 | 191% | 1.20 / 11.47 / 5.51 / 13.61 |
 | | 3840x2160 | 32.66 | 196% | 1.86 / 11.30 / 5.54 / 13.83 |
 
-At the defaults the CPU half is almost all of the frame: about 9 ms at 1080p, the
-sender and the receiver each ~2.5–4 ms, the line (a hash per bit) ~1.4 ms. Superfine
+At the defaults the CPU half is nearly all of the frame: about 9 ms at 1080p, with the
+sender and the receiver each ~2.5–4 ms and the line (a hash per bit) ~1.4 ms. Superfine
 halftone in Live mode is **not real-time** (about 31 fps). Page mode costs the print pass
-between pages and one CPU spike of the Live figure per page.
+between pages, plus one CPU spike of the Live figure per page.
 
 ### Not established
 
 It has **never been loaded into Resolume on macOS.** Everything above was compiled,
 rendered and measured offline against the real plugin class in a headless CGL context,
-plus an `oxbow` load. How the CPU half (on the render thread) behaves inside a busy
-composition, and what the host's clock does over hours, are untested.
+plus a load in `oxbow`.
 On Windows it has: a build of v0.1.0 loads, registers and renders in Resolume Arena 7.27.1
 on software rendering (win-lab, Mesa llvmpipe, no GPU, 2026-09-25), with all 19 host
 controls matching the declaration and Arena's log clean: 9 of the fleet Arena gate's 9
-checks, in one run. Eight controls were shown moving the picture there; Resolution,
+checks, in one run. Eight controls were shown moving the picture there. Resolution,
 Coding, Bursts, Baud, Concealment and Header were inconclusive, because Live mode codes a
-new page with new bit errors every frame and the picture never stands still (noise floor
+new page with new bit errors every frame and the picture never sits still (noise floor
 17.8 levels); the sweep above shows all 13 changing it. Software rendering says nothing
 about a GPU or about speed.
+I haven't tested how the CPU half (on the render thread) behaves inside a busy
+composition, or what the host's clock does over hours.
+
 The look has been seen on the synthetic test card and, through the harness's `--pipe`,
 on every bundled Shop74 clip and in the project video: clips on transparency print as
-pictures on paper; full-frame dark clips print nearly solid. MR's wedge is at most K
-lines, and K doubles as the lines halve, so on screen it is two or three lines of a
-1080-line frame at any resolution: the harness measures it, a viewer sees a thick streak.
-A superfine halftone page every frame is not real-time. The
+pictures on paper, and full-frame dark clips print nearly solid. MR's wedge is at most K
+lines, and K doubles as the lines halve, so on screen it's two or three lines of a
+1080-line frame at any resolution: the harness measures it, but a viewer just sees a thick
+streak. A superfine halftone page every frame isn't real-time. The
 [browser demo](https://fax-demo.stoatworks-labs.com/) runs the plugin's own shaders, but
-its CPU half — the coder, the line and the decoder — is a hand port to JavaScript: nothing
+its CPU half (the coder, the line and the decoder) is a hand port to JavaScript: nothing
 checks it on the page, and `demo/tools/check_port.sh` compares it bit for bit with the
 plugin's own C++ on twelve test pages (see Browser demo).
 
@@ -214,14 +212,14 @@ plugin's own C++ on twelve test pages (see Browser demo).
 [fax-demo.stoatworks-labs.com](https://fax-demo.stoatworks-labs.com/) runs the plugin's
 own scan and print shaders in WebGL2, with all 13 controls, on generated clips or your own
 image. The CPU half (header, T.4 coder, noisy line, decoder, page timing) is a JavaScript
-**port** in `demo/fax.js`: nobody checks it on the page but a reader, and
+**port** in `demo/fax.js`. Nobody checks it on the page but a reader, and
 `demo/tools/check_port.sh` (in `verify.sh`) compares it bit for bit with the plugin's C++
-source on twelve test pages. It is slower than the plugin; the page says so, and lists
+source on twelve test pages. It's slower than the plugin; the page says so, and lists
 every other difference.
 
 ## Build
 
-Needs CMake 3.15+, a C++17 compiler, and the FFGL SDK submodule.
+You'll need CMake 3.15+, a C++17 compiler and the FFGL SDK submodule.
 
 ```bash
 git clone --recursive https://github.com/stoatworks-labs/fax
@@ -232,7 +230,7 @@ cmake --install build     # into ~/Documents/Resolume Arena/Extra Effects
 ```
 
 macOS builds are universal (Apple Silicon + Intel) by default; add
-`-DCMAKE_OSX_ARCHITECTURES=arm64` for a faster dev build. Windows needs GLEW via vcpkg.
+`-DCMAKE_OSX_ARCHITECTURES=arm64` for a quicker dev build. Windows needs GLEW via vcpkg.
 
 ## Building and testing
 
@@ -252,7 +250,7 @@ python3 tools/sweep.py                                 # no control is silently 
 tools/verify.sh                                        # all of it, on a fresh universal build
 ```
 
-Every check takes `--size`; run it at 320×180 as well as the raster you care about, and
+Every check takes `--size`, so run it at 320×180 as well as the raster you care about, and
 with `FXTEST_RENDERER=software` for CI's renderer. Footage goes through the real plugin
 with `--pipe`, in the fleet's frame format:
 
@@ -262,8 +260,8 @@ ffmpeg -i in.mov -f rawvideo -pix_fmt rgba - \
   | ffmpeg -f rawvideo -pix_fmt rgba -s 1920x1080 -i - out.mov
 ```
 
-No OpenFX port in 0.1.0. There is a [browser demo](https://fax-demo.stoatworks-labs.com/).
-The browser demo's own checks:
+No OpenFX port in 0.1.0. There's a [browser demo](https://fax-demo.stoatworks-labs.com/),
+and these are its own checks:
 
 ```bash
 python3 demo/tools/check_shaders.py        # its shaders are the plugin's, character for character
