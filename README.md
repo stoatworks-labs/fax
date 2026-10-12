@@ -6,9 +6,10 @@
 > each claim back, from the code tables agreeing bit for bit with two independent
 > transcriptions of ITU-T T.4 (one of them Go's `x/image/ccitt`) to every line in Page mode
 > arriving within 2 ms of when the baud rate says it should, with nine negative controls to
-> show each check can fail. It has **never been loaded into Resolume**; the only host it has
-> met is [oxbow](https://github.com/stoatworks-labs/oxbow), which is a proper FFGL host but
-> isn't Resolume. The full list is under [Status](#status).
+> show each check can fail. It has **never been loaded into Resolume on macOS**; the only host
+> it has met there is [oxbow](https://github.com/stoatworks-labs/oxbow), which is a proper FFGL
+> host but isn't Resolume. On Windows it loads and renders in Arena 7.27.1, on software
+> rendering. The full list is under [Status](#status).
 
 Your clip sent as a Group 3 fax down a noisy telephone line, as an FFGL effect for
 [Resolume](https://resolume.com) Arena and Avenue. It's a proper T.4 coder, a line that flips
