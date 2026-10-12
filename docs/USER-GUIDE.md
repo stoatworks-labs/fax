@@ -297,7 +297,8 @@ Windows  %LOCALAPPDATA%\fax\logs\fax.YYYY-MM-DD.log
   the top, where a real receiver feeds new paper.
 - **Premultiplied alpha** wasn't established: whether Resolume hands an effect premultiplied
   textures moves a clip's partly transparent edges by a pel or two.
-- **Only ever run on an Apple M4 Max**, although the macOS build has an Intel slice in it.
+- **On a Mac I've only run it on Apple silicon** (an M4 Max, and CI's macOS runner), although
+  the macOS build has an Intel slice in it.
 - **No presets, no OpenFX version.**
 - **There's a browser demo** at [fax-demo.stoatworks-labs.com](https://fax-demo.stoatworks-labs.com).
   It's a port to a web page rather than the plugin: the shaders run in WebGL2, and the coder, the
